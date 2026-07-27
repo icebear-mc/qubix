@@ -39,19 +39,8 @@
     <nav>
         <div class="container">
             <a href="{% url 'world_list' %}"><strong>Welt-Ersteller</strong></a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'world_create' %}">Neue Welt</a>
-                <a href="{% url 'friend_request_list' %}">Freunde</a>
-                <a href="{% url 'nixon_chat' %}">Nixon AI</a>
-                <div class="nav-right">
-                    <span>Hallo, {{ user.username }}!</span>
-                    <a href="{% url 'logout' %}">Logout</a>
-                </div>
-            {% else %}
-                <div class="nav-right">
-                    <a href="{% url 'login' %}">Login</a>
-                </div>
-            {% endif %}
+            <a href="{% url 'world_create' %}">Neue Welt</a>
+            <a href="{% url 'access_code_list' %}">Zugangscodes</a>
         </div>
     </nav>
     
