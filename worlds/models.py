@@ -1,19 +1,17 @@
 from django.db import models
-from django.contrib.auth.models import User
-from social.models import Friendship
+from django.utils import timezone
 
 
 class World(models.Model):
     """Represents a world created by a user."""
     VISIBILITY_CHOICES = [
         ('private', 'Private'),
-        ('friends', 'Friends Only'),
         ('public', 'Public'),
     ]
     
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_worlds')
+    owner_id = models.IntegerField(help_text="Session-basierte Owner-ID (ohne User-Account)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='private')
@@ -25,53 +23,27 @@ class World(models.Model):
     def __str__(self):
         return self.name
     
-    def can_view(self, user):
-        """Check if a user can view this world."""
-        if not user.is_authenticated:
-            return self.visibility == 'public'
-        
+    @property
+    def owner(self):
+        """Dummy property for compatibility with templates."""
+        return type('obj', (object,), {'id': self.owner_id})
+    
+    def can_view(self, request):
+        """Check if request can view this world (based on session or visibility)."""
         # Owner always has access
-        if user == self.owner:
-            return True
-        
-        # Check collaborators (Feature 4)
-        from collaboration.models import WorldCollaborator
-        collaborator = WorldCollaborator.objects.filter(
-            world=self, 
-            user=user, 
-            status='accepted'
-        ).first()
-        if collaborator:
+        if request.session.get('owner_id') == self.owner_id:
             return True
         
         # Public worlds are visible to everyone
         if self.visibility == 'public':
             return True
         
-        # Friends-only: check if user is a friend of the owner
-        if self.visibility == 'friends':
-            return Friendship.are_friends(user, self.owner)
-        
+        # Private worlds require access code
         return False
     
-    def can_edit(self, user):
-        """Check if a user can edit this world."""
-        if not user.is_authenticated:
-            return False
-        
-        # Owner can always edit
-        if user == self.owner:
-            return True
-        
-        # Check for editor role in collaborators
-        from collaboration.models import WorldCollaborator
-        collaborator = WorldCollaborator.objects.filter(
-            world=self, 
-            user=user, 
-            status='accepted', 
-            role='editor'
-        ).first()
-        return bool(collaborator)
+    def can_edit(self, request):
+        """Check if request can edit this world."""
+        return request.session.get('owner_id') == self.owner_id
 
 
 class WorldElement(models.Model):
@@ -104,7 +76,7 @@ class WorldElement(models.Model):
     category = models.CharField(max_length=100, blank=True)  # For lore entries (custom categories)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    last_edited_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='edited_elements')
+    last_edited_by_id = models.IntegerField(null=True, blank=True, help_text="Session-basierte ID")
     
     class Meta:
         ordering = ['-updated_at']
@@ -118,3 +90,10 @@ class WorldElement(models.Model):
     def get_display_name(self):
         """Returns the appropriate name field based on element type."""
         return self.name or self.title
+    
+    @property
+    def last_edited_by(self):
+        """Dummy property for compatibility."""
+        if self.last_edited_by_id:
+            return type('obj', (object,), {'id': self.last_edited_by_id})
+        return None
