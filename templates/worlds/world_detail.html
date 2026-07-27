@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ world.name }} - Welt-Ersteller{% endblock %}
+{% block content %}
+<h1>{{ world.name }}</h1>
+<p>{{ world.description }}</p>
+<p><small>Sichtbarkeit: {{ world.get_visibility_display }} | Besitzer: {{ world.owner.username }}</small></p>
+
+{% if can_edit %}
+    <div style="margin: 1rem 0;">
+        <a href="{% url 'world_edit' world.pk %}" class="btn btn-secondary">Welt bearbeiten</a>
+        <a href="{% url 'world_invite_collaborator' world.pk %}" class="btn btn-secondary">Mitarbeiter einladen</a>
+        <a href="{% url 'nixon_chat_world' world.pk %}" class="btn btn-primary">Nixon fragen</a>
+    </div>
+    
+    <h3>Neues Element erstellen:</h3>
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'element_create' world.pk 'creature' %}" class="btn btn-secondary">Kreatur</a>
+        <a href="{% url 'element_create' world.pk 'people' %}" class="btn btn-secondary">Volk</a>
+        <a href="{% url 'element_create' world.pk 'map' %}" class="btn btn-secondary">Karte</a>
+        <a href="{% url 'element_create' world.pk 'lore' %}" class="btn btn-secondary">Lore-Eintrag</a>
+    </div>
+{% endif %}
+
+<h2>Kreaturen ({{ creatures.count }})</h2>
+{% if creatures %}
+    <ul>
+        {% for c in creatures %}
+            <li><a href="{% url 'element_detail' c.pk %}">{{ c.name }}</a> - {{ c.habitat }}</li>
+        {% endfor %}
+    </ul>
+{% else %}<p>Keine Kreaturen vorhanden.</p>{% endif %}
+
+<h2>Völker ({{ peoples.count }})</h2>
+{% if peoples %}
+    <ul>
+        {% for p in peoples %}
+            <li><a href="{% url 'element_detail' p.pk %}">{{ p.name }}</a> - {{ p.language_name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}<p>Keine Völker vorhanden.</p>{% endif %}
+
+<h2>Karten ({{ maps.count }})</h2>
+{% if maps %}
+    <ul>
+        {% for m in maps %}
+            <li><a href="{% url 'map_view' m.pk %}">{{ m.title }}</a> ({{ m.get_map_type_display }})</li>
+        {% endfor %}
+    </ul>
+{% else %}<p>Keine Karten vorhanden.</p>{% endif %}
+
+<h2>Lore ({{ lore.count }})</h2>
+{% if lore %}
+    <ul>
+        {% for l in lore %}
+            <li><a href="{% url 'element_detail' l.pk %}">{{ l.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}<p>Keine Lore-Einträge vorhanden.</p>{% endif %}
+{% endblock %}

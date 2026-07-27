@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Welten - Welt-Ersteller{% endblock %}
+{% block content %}
+<h1>Deine Welten</h1>
+{% if worlds %}
+    <div class="grid">
+        {% for world in worlds %}
+            <div class="card">
+                <h3><a href="{% url 'world_detail' world.pk %}">{{ world.name }}</a></h3>
+                <p>{{ world.description|truncatewords:20 }}</p>
+                <p><small>Sichtbarkeit: {{ world.get_visibility_display }}</small></p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Du hast noch keine Welten erstellt.</p>
+{% endif %}
+{% endblock %}

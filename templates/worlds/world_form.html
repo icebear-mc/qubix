@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{% if action == 'create' %}Neue Welt{% else %}Welt bearbeiten{% endif %} - Welt-Ersteller{% endblock %}
+{% block content %}
+<h1>{% if action == 'create' %}Neue Welt erstellen{% else %}Welt bearbeiten{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" value="{{ world.name|default:'' }}" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Beschreibung:</label>
+        <textarea name="description" id="description">{{ world.description|default:'' }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="visibility">Sichtbarkeit:</label>
+        <select name="visibility" id="visibility">
+            <option value="private" {% if world.visibility == 'private' %}selected{% endif %}>Privat</option>
+            <option value="friends" {% if world.visibility == 'friends' %}selected{% endif %}>Freunde</option>
+            <option value="public" {% if world.visibility == 'public' %}selected{% endif %}>Öffentlich</option>
+        </select>
+    </div>
+    {% if world.cover_image %}
+        <p>Aktuelles Cover: {{ world.cover_image }}</p>
+    {% endif %}
+    <div class="form-group">
+        <label for="cover_image">Neues Cover-Bild:</label>
+        <input type="file" name="cover_image" id="cover_image" accept="image/*">
+    </div>
+    <button type="submit" class="btn btn-primary">{% if action == 'create' %}Erstellen{% else %}Speichern{% endif %}</button>
+    <a href="{% if world.pk %}{% url 'world_detail' world.pk %}{% else %}{% url 'world_list' %}{% endif %}" class="btn btn-secondary">Abbrechen</a>
+</form>
+{% endblock %}

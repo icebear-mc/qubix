@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Element erstellen - Welt-Ersteller{% endblock %}
+{% block content %}
+<h1>{{ element_type|title }} {% if action == 'create' %}erstellen{% else %}bearbeiten{% endif %}</h1>
+<form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+    {% if element_type == 'map' %}
+        <div class="form-group">
+            <label for="title">Titel:</label>
+            <input type="text" name="title" id="title" value="{{ element.title|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="map_type">Kartentyp:</label>
+            <select name="map_type" id="map_type">
+                <option value="land" {% if element.map_type == 'land' %}selected{% endif %}>Landkarte</option>
+                <option value="city" {% if element.map_type == 'city' %}selected{% endif %}>Stadtkarte</option>
+            </select>
+        </div>
+    {% elif element_type == 'lore' %}
+        <div class="form-group">
+            <label for="title">Titel:</label>
+            <input type="text" name="title" id="title" value="{{ element.title|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="category">Kategorie:</label>
+            <input type="text" name="category" id="category" value="{{ element.category|default:'' }}" placeholder="z.B. Geschichte, Artefakt, Fraktion">
+        </div>
+        <div class="form-group">
+            <label for="content">Inhalt:</label>
+            <textarea name="content" id="content" style="min-height: 200px;">{{ element.content|default:'' }}</textarea>
+        </div>
+    {% elif element_type == 'creature' %}
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" value="{{ element.name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="habitat">Habitat:</label>
+            <input type="text" name="habitat" id="habitat" value="{{ element.habitat|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="description">Beschreibung:</label>
+            <textarea name="description" id="description">{{ element.description|default:'' }}</textarea>
+        </div>
+    {% elif element_type == 'people' %}
+        <div class="form-group">
+            <label for="name">Name des Volkes:</label>
+            <input type="text" name="name" id="name" value="{{ element.name|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="language_name">Sprache:</label>
+            <input type="text" name="language_name" id="language_name" value="{{ element.language_name|default:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="culture">Kultur:</label>
+            <textarea name="culture" id="culture">{{ element.culture|default:'' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="description">Beschreibung:</label>
+            <textarea name="description" id="description">{{ element.description|default:'' }}</textarea>
+        </div>
+    {% endif %}
+    
+    <div class="form-group">
+        <label for="image">Bild:</label>
+        <input type="file" name="image" id="image" accept="image/*">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">{% if action == 'create' %}Erstellen{% else %}Speichern{% endif %}</button>
+    <a href="{% if element.world %}{% url 'world_detail' element.world.pk %}{% else %}{% url 'world_detail' world.pk %}{% endif %}" class="btn btn-secondary">Abbrechen</a>
+</form>
+{% endblock %}
