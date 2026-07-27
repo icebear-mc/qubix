@@ -1,12 +1,17 @@
 from django.urls import path
 from . import views
 
+app_name = 'social'
+
 urlpatterns = [
-    path('users/search/', views.user_search, name='user_search'),
-    path('friend/request/send/<str:username>/', views.friend_request_send, name='friend_request_send'),
-    path('friend/requests/', views.friend_request_list, name='friend_request_list'),
-    path('friend/request/<int:pk>/accept/', views.friend_request_accept, name='friend_request_accept'),
-    path('friend/request/<int:pk>/decline/', views.friend_request_decline, name='friend_request_decline'),
-    path('friends/', views.friend_list, name='friend_list'),
-    path('friend/remove/<str:username>/', views.friend_remove, name='friend_remove'),
+    # Zugangscode-basierter Zugriff (ohne Account)
+    path('access/<uuid:code>/', views.access_world, name='access_world'),
+    path('world/<int:world_id>/codes/create/', views.create_access_code, name='create_access_code'),
+    path('world/<int:world_id>/codes/manage/', views.manage_access_codes, name='manage_access_codes'),
+    path('code/<int:code_id>/deactivate/', views.deactivate_code, name='deactivate_code'),
+    
+    # Kommentare (ohne Account)
+    path('world/<int:world_id>/comment/add/', views.add_comment, name='add_comment'),
+    path('comment/<int:comment_id>/approve/', views.approve_comment, name='approve_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 ]

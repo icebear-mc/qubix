@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Zugangscode erstellen - {{ world.name }}{% endblock %}
+{% block content %}
+<h1>Neuen Zugangscode erstellen</h1>
+<p>Welt: <strong>{{ world.name }}</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 15px;">
+        <label for="description">Beschreibung (optional):</label><br>
+        <input type="text" id="description" name="description" placeholder="z.B. Für Spielergruppe A" style="width: 300px; padding: 8px;">
+    </div>
+    <button type="submit" class="btn">Code erstellen</button>
+    <a href="{% url 'world_detail' world.pk %}" class="btn" style="background: #6c757d;">Abbrechen</a>
+</form>
+
+<style>
+.btn { display: inline-block; padding: 8px 16px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+</style>
+{% endblock %}
