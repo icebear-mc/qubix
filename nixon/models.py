@@ -1,11 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
 from worlds.models import World
 
 
 class NixonConversation(models.Model):
     """Represents a conversation with the Nixon AI assistant."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='nixon_conversations')
+    session_id = models.CharField(max_length=100, help_text="Session-based identifier")
     world = models.ForeignKey(World, on_delete=models.SET_NULL, null=True, blank=True, related_name='nixon_conversations')
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -14,7 +13,7 @@ class NixonConversation(models.Model):
     
     def __str__(self):
         world_name = self.world.name if self.world else "No World"
-        return f"{self.user.username} - {world_name} ({self.created_at})"
+        return f"{self.session_id} - {world_name} ({self.created_at})"
 
 
 class NixonMessage(models.Model):
